@@ -1,0 +1,14 @@
+{
+    "_id": 7,
+    "tipo_persona": "natural",
+    "tipo_identificacion": "cedula",
+    "identificacion": "0922067715",
+    "nombres": "Ronald",
+    "apellidos": "Barrera Larrea",
+    "extranjero": false,
+    "genero": "masculino",
+    "estado_civil": "casado",
+    "correo": "rbar.ec@gmail.com",
+    "estado": "activo",
+    "direccion": "Mucho Lote 2",
+}
