@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import persona.dao.Persona;
+import persona.util.GenericResponse;
 import persona.util.GenericResponseSearch;
 import persona.util.MyUtil;
 
@@ -35,6 +38,102 @@ public class PersonaAPI {
 	
 	@Autowired
 	PersonaService personaService;
+	
+	
+	
+	
+	
+	
+	@ApiOperation(value = "todas las personas")
+	@GetMapping("/all")
+	@ResponseBody
+	public ResponseEntity<GenericResponse<List<String>>> allPersonas(//
+			HttpServletRequest request) {
+		//
+		long startTransactionTime = System.currentTimeMillis();
+		HttpHeaders headers = new HttpHeaders();
+		String transactionId = MyUtil.generateUID();
+		GenericResponse<List<String>> response = new GenericResponse<>();
+		try {
+			List<String> res = personaService.findAll();
+			response.setResult(res);
+			response.setMessage("EXITO");
+			response.setCode(200);
+			headers.add("transaction_id", transactionId);
+			headers.add("transaction_time", totalTime(startTransactionTime));
+			return new ResponseEntity<>(response, HttpStatus.OK);
+			//
+		} catch (Exception e) {
+			//
+			log.error(e);
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	
+	
+	@ApiOperation(value = "todas los catalogos (interoperabilidad HTTP)")
+	@GetMapping("/catalogos")
+	@ResponseBody
+	public ResponseEntity<GenericResponse<List<String>>> allcatalogos(//
+			HttpServletRequest request) {
+		//
+		long startTransactionTime = System.currentTimeMillis();
+		HttpHeaders headers = new HttpHeaders();
+		String transactionId = MyUtil.generateUID();
+		GenericResponse<List<String>> response = new GenericResponse<>();
+		try {
+			List<String> res = personaService.getcatalogos();
+			response.setResult(res);
+			response.setMessage("EXITO");
+			response.setCode(200);
+			headers.add("transaction_id", transactionId);
+			headers.add("transaction_time", totalTime(startTransactionTime));
+			return new ResponseEntity<>(response, HttpStatus.OK);
+			//
+		} catch (Exception e) {
+			//
+			log.error(e);
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	
+	
+	
+	
+	@ApiOperation(value = "get Random Persona")
+	@GetMapping("/random")
+	@ResponseBody
+	public ResponseEntity<GenericResponse<Persona>> allRandom_Personas(//
+			HttpServletRequest request) {
+		//
+		long startTransactionTime = System.currentTimeMillis();
+		HttpHeaders headers = new HttpHeaders();
+		String transactionId = MyUtil.generateUID();
+		GenericResponse<Persona> response = new GenericResponse<>();
+		try {
+			Persona res = personaService.getRandomPersona();
+			response.setResult(res);
+			response.setMessage("EXITO");
+			response.setCode(200);
+			headers.add("transaction_id", transactionId);
+			headers.add("transaction_time", totalTime(startTransactionTime));
+			return new ResponseEntity<>(response, headers, HttpStatus.OK);
+			//
+		} catch (Exception e) {
+			//
+			log.error(e);
+			headers.add("transaction_id", transactionId);
+			headers.add("transaction_time", totalTime(startTransactionTime));
+			return new ResponseEntity<>(response, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	
+	
+	
 	
 	@ApiOperation(value = "Buscar Personas con Paginacion y ordenacion disponibles")
 	@RequestMapping(value = "/search", method = RequestMethod.POST, consumes = "application/json")
