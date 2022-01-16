@@ -3,7 +3,6 @@ package persona.api;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,14 +10,10 @@ import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
-
 import lombok.extern.log4j.Log4j2;
-import persona.config.CacheManagementService;
 import persona.dao.Persona;
 import persona.dao.PersonaRepository;
 import persona.util.CatalogoDTO;
@@ -34,12 +29,12 @@ public class PersonaService {
 	@Autowired
 	CatalogoClientService catalogoClientService;
 	
-	@Autowired
-	CacheManagementService cacheManagementService;
+//	@Autowired
+//	CacheManagementService cacheManagementService;
 
-	@Autowired
-	@Qualifier("queryTemplate")
-	private RedisTemplate<String, List<Object>> template;
+//	@Autowired
+//	@Qualifier("queryTemplate")
+//	private RedisTemplate<String, List<Object>> template;
 
 	public Persona getRandomPersona() throws Exception {
 		int id = getRandom(1, 2000);
@@ -97,7 +92,7 @@ public class PersonaService {
 	}
 
 	private boolean toCache(Persona per) {
-		cacheManagementService.putItem("persona", "personaID-" + per.getId(), per);
+//		cacheManagementService.putItem("persona", "personaID-" + per.getId(), per);
 		
 //		RedisConnection conn = template.getConnectionFactory().getConnection();
 //		try {
@@ -113,8 +108,8 @@ public class PersonaService {
 	}
 
 	private Persona getFromCache(Long l2) {
-		Object o = cacheManagementService.getItem("persona", "personaID-" + l2);
-		if(o!=null) return (Persona)o;
+//		Object o = cacheManagementService.getItem("persona", "personaID-" + l2);
+	//	if(o!=null) return (Persona)o;
 		return null;
 //		String key = "personaID-" + l2;
 //		RedisConnection conn = template.getConnectionFactory().getConnection();

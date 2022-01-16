@@ -25,9 +25,9 @@ import persona.util.CatalogoDTO.ItemCat;
 @Service
 public class CatalogoClientService {
 
-	@Autowired
-	@Qualifier("queryTemplate")
-	private RedisTemplate<String, List<Object>> template;
+//	@Autowired
+//	@Qualifier("queryTemplate")
+//	private RedisTemplate<String, List<Object>> template;
 	
 	@Value("${invoke_catalog.estado_civil}")
 	String rutaEstadoCivil;

@@ -11,12 +11,12 @@ import org.springframework.stereotype.Repository;
 public interface PersonaRepository extends MongoRepository<Persona, Long>, PersonaRepositoryCustom {
 
 
-	@Cacheable(value = "persona", key = "#p0", cacheManager = "metadataCacheManager")
+//	@Cacheable(value = "persona", key = "#p0", cacheManager = "metadataCacheManager")
 	public Optional<Persona> findById(//
 			@Param("id")  Long id);
 
 	
-	@Cacheable(value = "persona", key = "#p0", cacheManager = "metadataCacheManager")
+//	@Cacheable(value = "persona", key = "#p0", cacheManager = "metadataCacheManager")
 	public Optional<Persona> findByIdentificacion(//
 			@Param("identificacion")  String identificacion);
 }
