@@ -72,4 +72,7 @@ public class Persona implements Serializable {
 	@Field(value = "nacionalidad")
 	private String nacionalidad;
 
+	
+	@Field(value = "cache")
+	private boolean cache;
 }

@@ -90,38 +90,7 @@ public class PersonaAPI {
 		String transactionId = MyUtil.generateUID();
 		GenericResponse<Persona> response = new GenericResponse<>();
 		try {
-			Persona res = personaService.apiGetPersonaById(identificacion);
-//			if (res != null) {
-//				////////////PING
-//				System.out.println("REDIS PING .......");
-//				String pong =  template.getConnectionFactory().getConnection().ping();
-//				System.out.println(pong);
-//				System.out.println("getClientName:   "+template.getConnectionFactory().getConnection().getClientName());
-//				System.out.println("exist name:   "+template.getConnectionFactory().getConnection().exists("name".getBytes()));
-//				System.out.println("put:   "+template.getConnectionFactory().getConnection().lPush("test3".getBytes(), "ronbar222".getBytes()));
-//				
-//				byte[] data = template.getConnectionFactory().getConnection().lPop("test3".getBytes());
-//				if(data!=null) {
-//					String z = new String(data, StandardCharsets.UTF_8);
-//					System.out.println("get:   "+z);
-//				}
-//				List<Object> lo = getList(res);
-//				TimeUnit timeunit = TimeUnit.valueOf(ttlUnit);
-//				Integer timeToLive = Integer.valueOf(ttlValue);
-//				String key = "IS-identificacion-" + identificacion;
-////				template.persist(key);
-//				boolean hayname = template.hasKey("name");
-//				System.out.println("tiene Key name ......."+ hayname);
-//				boolean noExisteDatosEnREDIS = !template.hasKey(key);
-//				if(noExisteDatosEnREDIS) {
-//					template.opsForValue().set(key, lo, timeToLive, timeunit);					
-//				}else {
-//					Object xxx = template.opsForValue().get(key);
-//					Persona xx = (Persona)xxx;
-//					System.out.println("REDIS .......");
-//					System.out.println(xx);
-//				}
-//			}
+			Persona res = personaService.apiGetPersonaByIdentificacion(identificacion);
 			response.setResult(res);
 			response.setMessage("EXITO ");
 			response.setCode(200);
@@ -138,6 +107,59 @@ public class PersonaAPI {
 			return new ResponseEntity<>(response, headers, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
+
+	
+	
+	
+	
+	
+	@GetMapping("/id/{id}")
+	@ResponseBody
+	public ResponseEntity<GenericResponse<Persona>> getById(//
+			@PathVariable @Validated Long id, //
+			HttpServletRequest request) {
+		//
+		long startTransactionTime = System.currentTimeMillis();
+		HttpHeaders headers = new HttpHeaders();
+		String transactionId = MyUtil.generateUID();
+		GenericResponse<Persona> response = new GenericResponse<>();
+		try {
+			Persona res = personaService.apiGetPersonaById(id);
+			response.setResult(res);
+			response.setMessage("EXITO ");
+			response.setCode(200);
+			headers.add("transaction_id", transactionId);
+			headers.add("transaction_time", totalTime(startTransactionTime));
+			response.setTime(totalTime(startTransactionTime));
+			return new ResponseEntity<>(response, headers, HttpStatus.OK);
+			//
+		} catch (Exception e) {
+			//
+			log.error(e);
+			headers.add("transaction_id", transactionId);
+			headers.add("transaction_time", totalTime(startTransactionTime));
+			return new ResponseEntity<>(response, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	@GetMapping("/catalogos")
 	@ResponseBody

@@ -5,25 +5,20 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 
 import lombok.extern.log4j.Log4j2;
+import persona.config.CacheManagementService;
 import persona.dao.Persona;
 import persona.dao.PersonaRepository;
 import persona.util.CatalogoDTO;
@@ -38,6 +33,9 @@ public class PersonaService {
 	PersonaRepository personaRepository;
 	@Autowired
 	CatalogoClientService catalogoClientService;
+	
+	@Autowired
+	CacheManagementService cacheManagementService;
 
 	@Autowired
 	@Qualifier("queryTemplate")
@@ -45,10 +43,12 @@ public class PersonaService {
 
 	public Persona getRandomPersona() throws Exception {
 		int id = getRandom(1, 2000);
+		System.out.println(" RANDOM >>>>>" + id);
 		long l = id;
 		Long l2 = Long.valueOf(l);
 		Persona pcache = getFromCache(l2);
 		if (pcache != null) {
+			pcache.setCache(true);
 			return pcache;
 		} else {
 
@@ -64,40 +64,77 @@ public class PersonaService {
 //				Optional<Persona> p2 = personaRepository.findById(l22);
 //				validarPersona(p2.get());
 //				return p2.isPresent() ? p2.get() : null;
-			return null;
+				return null;
 			}
+		}
+	}
+
+	public Persona apiGetPersonaByIdentificacion(String identificacion) throws Exception {
+		Optional<Persona> per = personaRepository.findByIdentificacion(identificacion);
+		if (per.isPresent()) {
+			if (validarPersona(per.get())) {
+				toCache(per.get());
+				return per.get();
+			}
+		}
+		return null;
+	}
+
+	public Persona apiGetPersonaById(Long idPersona) throws Exception {
+		Persona pcache = getFromCache(idPersona);
+		if (pcache != null) {
+			pcache.setCache(true);
+			return pcache;
+		} else {
+			Optional<Persona> per = personaRepository.findById(idPersona);
+			if (per.isPresent()) {
+				validarPersona(per.get());
+				toCache(per.get());
+				return per.get();
+			}
+			return null;
 		}
 	}
 
 	private boolean toCache(Persona per) {
-		try {
-			String key = "personaID-" + per.getId();
-			String out = new Gson().toJson(per);
-			template.getConnectionFactory().getConnection().lPush(key.getBytes(), out.getBytes());
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+		cacheManagementService.putItem("persona", "personaID-" + per.getId(), per);
+		
+//		RedisConnection conn = template.getConnectionFactory().getConnection();
+//		try {
+//			String key = "personaID-" + per.getId();
+//			String out = new Gson().toJson(per);
+//			conn.append(key.getBytes(), out.getBytes());
+//			conn.close();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return false;
+//		}
 		return true;
 	}
 
 	private Persona getFromCache(Long l2) {
-		String key = "personaID-" + l2;
-		boolean existeKey = template.getConnectionFactory().getConnection().exists(key.getBytes());
-		System.out.println("la " + key + " existe?   " + existeKey);
-		boolean gotoBase = !existeKey;
-		if (existeKey) {
-			byte[] data = template.getConnectionFactory().getConnection().lPop(key.getBytes());
-			if (data != null) {
-				String jsondata = new String(data, StandardCharsets.UTF_8);
-				Persona dataPersona = new Gson().fromJson(jsondata, Persona.class);
-				System.out.println("CACHE object ....:   " + dataPersona);
-				return dataPersona;
-			} else {
-				gotoBase = true;
-			}
-		}
+		Object o = cacheManagementService.getItem("persona", "personaID-" + l2);
+		if(o!=null) return (Persona)o;
 		return null;
+//		String key = "personaID-" + l2;
+//		RedisConnection conn = template.getConnectionFactory().getConnection();
+//		try {
+//		boolean existeKey = conn.exists(key.getBytes());
+//		System.out.println("la " + key + " existe?   " + existeKey);
+//		if (existeKey) {
+//			byte[] data = conn.get(key.getBytes());
+//			if (data != null) {
+//				String jsondata = new String(data, StandardCharsets.UTF_8);
+//				Persona dataPersona = new Gson().fromJson(jsondata, Persona.class);
+//				System.out.println("CACHE object ....:   " + dataPersona);
+//				conn.close();
+//				return dataPersona;
+//			} 
+//		}
+//		}catch(Exception e) {
+//			conn.close();
+//		}
+//		return null;
 	}
 
 	private byte[] tobytes(Object yourObject) throws IOException {
@@ -116,14 +153,6 @@ public class PersonaService {
 				// ignore close exception
 			}
 		}
-	}
-
-	public Persona apiGetPersonaById(String identificacion) throws Exception {
-		Optional<Persona> per = personaRepository.findByIdentificacion(identificacion);
-		if (per.isPresent()) {
-			return per.get();
-		}
-		return null;
 	}
 
 	public Persona getPersonaById(Long idPersona) throws Exception {

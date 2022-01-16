@@ -1,5 +1,9 @@
 package persona.config;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
@@ -36,5 +40,16 @@ public class CacheManagementService {
 	public void putItem(String domain, String key, Object object) {
 		this.metadataCacheManager.getCache(domain).put(key, object);
 	}
+	
+	public Object getItem(String domain, String key) {
+		return this.metadataCacheManager.getCache(domain).get(key);
+	}
 
+	
+	public List<String> getdomains(String domain) {
+		Collection<String> c = this.metadataCacheManager.getCacheNames();
+		if(c!=null)
+		return new ArrayList<>(c);
+		return null;
+	}
 }
