@@ -1,4 +1,4 @@
-package catalog.util;
+package catalog.api;
 
 import java.io.Serializable;
 

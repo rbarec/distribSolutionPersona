@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import catalog.util.ItemCat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -36,6 +35,12 @@ public class Catalogo implements Serializable {
 	@Field(value = "codigo")
 	@ApiModelProperty(value = "codigo unico de catalogo por Instancia de cliente")
 	private String codigo;
+	
+	private String contexto;
+	
+	private String grupo;
+	
+	private List<String> tags;
 
 	@Field(value = "items")
 	@ApiModelProperty(value = "Items, lista de valores que dan razon al catalogo")

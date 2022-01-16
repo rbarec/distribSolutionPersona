@@ -25,18 +25,10 @@ public class PersonaService {
 
 	@Autowired
 	PersonaRepository personaRepository;
+	
+	CatalogoClientService catalogoClientService;
 
-	@Value("${invoke_catalog.estado_civil}")
-	String rutaEstadoCivil;
 
-	@Value("${invoke_catalog.tipo_persona}")
-	String rutaTipoPersona;
-
-	@Value("${invoke_catalog.tipo_identificacion}")
-	String rutaTipoIdentificacion;
-
-	@Autowired
-	protected RestTemplate restTemplate;
 
 	public Persona getPersonaById(Long idPersona) throws Exception {
 		Optional<Persona> per = personaRepository.findById(idPersona);
@@ -148,7 +140,10 @@ public class PersonaService {
 			validarPersona(p.get());
 			return p.get();
 		} else {
-			Optional<Persona> p2 = personaRepository.findById(l2);
+			int id2 = getRandom(1, 2000);
+			long l2x = id2;
+			Long l22 = Long.valueOf(l2x);
+			Optional<Persona> p2 = personaRepository.findById(l22);
 			validarPersona(p2.get());
 			return p2.isPresent() ? p2.get() : null;
 		}
@@ -156,7 +151,8 @@ public class PersonaService {
 	
 	
 	public boolean validarPersona(Persona p) throws Exception{
-		 CatalogoDTO  ec = getCatalogo_EstadosCivil();
+		
+		 CatalogoDTO  ec = catalogoClientService.getCatalogo_EstadosCivil();
 		 boolean vec=false;
 		 boolean vtp=false;
 		 boolean vti=false;
@@ -166,13 +162,13 @@ public class PersonaService {
 				 vec =  true;
 			 }
 		 }
-		 ec = getCatalogo_TipoPersona();
+		 ec = catalogoClientService.getCatalogo_TipoPersona();
 		 for( ItemCat i : ec.getItems() ) {
 			 if( i.getKey().equalsIgnoreCase( p.getTipoPersona() )  ) {
 				 vtp =  true;
 			 }
 		 }
-		 ec = getCatalogo_TipoIdentificacion();
+		 ec = catalogoClientService.getCatalogo_TipoIdentificacion();
 		 for( ItemCat i : ec.getItems() ) {
 			 if( i.getKey().equalsIgnoreCase( p.getTipoIdentificacion() )  ) {
 				 vti =  true;
@@ -183,72 +179,10 @@ public class PersonaService {
 	}
 
 	public List<String> getcatalogos() throws Exception {
-		List<String> a = new ArrayList<>();
-		CatalogoDTO a1 = getCatalogo_EstadosCivil();
-		if (a1 == null || a1.getItems() == null) {
-			a.add("Error Estado Civil  - null");
-		} else {
-			for (ItemCat x : a1.getItems()) {
-				a.add("estadoCivil:  " + x.getKey());
-			}
-		}
-		a1 = getCatalogo_TipoPersona();
-		if (a1 == null || a1.getItems() == null) {
-			a.add("Error TipoPersona  - null");
-		} else {
-			for (ItemCat x : a1.getItems()) {
-				a.add("TipoPersona:  " + x.getKey());
-			}
-		}
-		a1 = getCatalogo_TipoIdentificacion();
-		if (a1 == null || a1.getItems() == null) {
-			a.add("Error TipoIdentificacion  - null");
-		} else {
-			for (ItemCat x : a1.getItems()) {
-				a.add("TipoIdentificacion:  " + x.getKey());
-			}
-		}
-		return a;
+		// TODO Auto-generated method stub
+		return catalogoClientService.getcatalogos();
 	}
 
-	public CatalogoDTO getCatalogo_EstadosCivil() throws Exception {
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-		headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-		headers.set("Content-Type", "application/json");
-
-		CatalogoDTO json = restTemplate.getForObject(rutaEstadoCivil, CatalogoDTO.class);
-		System.out.println(json);
-
-		return json;
-
-	}
-
-	public CatalogoDTO getCatalogo_TipoPersona() throws Exception {
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-		headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-		headers.set("Content-Type", "application/json");
-
-		CatalogoDTO json = restTemplate.getForObject(rutaTipoPersona, CatalogoDTO.class);
-		System.out.println(json);
-
-		return json;
-	}
-
-	public CatalogoDTO getCatalogo_TipoIdentificacion() throws Exception {
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-		headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-		headers.set("Content-Type", "application/json");
-
-		CatalogoDTO json = restTemplate.getForObject(rutaTipoIdentificacion, CatalogoDTO.class);
-		System.out.println(json);
-
-		return json;
-	}
 
 }

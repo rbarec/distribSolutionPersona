@@ -11,6 +11,7 @@ import catalog.api.Catalogo;
 public interface CatalogoRepository extends MongoRepository<Catalogo, Long> {
 
 	public Optional<Catalogo> findByCodigo(String codigo);
+	public Optional<Catalogo> findByContextoAndGrupo(String contexto, String grupo);
 	
 
 }

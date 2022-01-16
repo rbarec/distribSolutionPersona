@@ -19,34 +19,30 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-@Api(value = "Catalog Distribuidos")
+@Api(value = "Conocimiento Base Consultas API")
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1")
-public class CatalogoAPI {
+public class KnobaseAPI {
 
 	@Autowired
 	CatalogoService myService;
 
 
-	@ApiOperation(value = "Esta operacion obtiene CATALOGO por codigo.")
-	@GetMapping("/catalogos/{codigo}")
+	@ApiOperation(value = "Esta operacion obtiene Contexto y Grupo por codigo.")
+	@GetMapping("/catalogos/{contexto}/grupo/{grupo}")
 	public ResponseEntity<Catalogo> getCatalogoByCodigo( //
-			@PathVariable @Validated String codigo //
+			@PathVariable @Validated String contexto //
+			, @PathVariable @Validated String grupo //
 			, HttpServletRequest request //
 	) {
-		long startTransactionTime = System.currentTimeMillis();
-		String transactionId = MyUtil.generateUID();
 		Catalogo response = null;
-
 		try {
-			Catalogo obj = myService.getCatalogoActivo(codigo);
+			Catalogo obj = myService.getConocimientoContextoGrupo(contexto, grupo);
 			return new ResponseEntity<>(obj, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
-
-			MyUtil.addTransactionTime(startTransactionTime);
 		}
 	}
 
