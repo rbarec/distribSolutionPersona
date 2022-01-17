@@ -102,24 +102,73 @@ public class PersonaAPI {
 	}
 
 	private boolean validarPersona(Persona p) throws Exception {
-		CatalogoDTO ec = catalogoClientService.getCatalogo_EstadosCivil();
+		
+		
+		
+		CatalogoDTO ec1 = null;
+		String key1 = "catalogoID-ecivil";
+		boolean existeCache = jedisUtil.exists(key1);
+		if (existeCache) {
+			String strobj = jedisUtil.get(key1);
+			 ec1 = new Gson().fromJson(strobj, CatalogoDTO.class);
+			System.out.println("CACHE object ....catalogoID-ecivil :   " + ec1);
+		}else {
+			ec1= catalogoClientService.getCatalogo_EstadosCivil();
+			if (ec1!=null) {
+				String out = new Gson().toJson(ec1);
+				jedisUtil.set(key1, out);
+			}
+		}
 		boolean vec = false;
 		boolean vtp = false;
 		boolean vti = false;
-
-		for (ItemCat i : ec.getItems()) {
+		for (ItemCat i : ec1.getItems()) {
 			if (i.getKey().equalsIgnoreCase(p.getEstadoCivil())) {
 				vec = true;
 			}
 		}
-		ec = catalogoClientService.getCatalogo_TipoPersona();
-		for (ItemCat i : ec.getItems()) {
+		
+		
+		
+		CatalogoDTO ec2 = null;
+		String key2 = "catalogoID-tipopersona";
+		boolean existeCache2 = jedisUtil.exists(key2);
+		if (existeCache2) {
+			String strobj = jedisUtil.get(key2);
+			 ec2 = new Gson().fromJson(strobj, CatalogoDTO.class);
+			System.out.println("CACHE object ....catalogoID-tipopersona :   " + ec2);
+		}else {
+			ec2= catalogoClientService.getCatalogo_TipoPersona();
+			if (ec2!=null) {
+				String out = new Gson().toJson(ec2);
+				jedisUtil.set(key2, out);
+			}
+		}
+		for (ItemCat i : ec2.getItems()) {
 			if (i.getKey().equalsIgnoreCase(p.getTipoPersona())) {
 				vtp = true;
 			}
 		}
-		ec = catalogoClientService.getCatalogo_TipoIdentificacion();
-		for (ItemCat i : ec.getItems()) {
+		
+		
+		
+		
+		
+		CatalogoDTO ec3 = null;
+		String key3 = "catalogoID-tipoIdentificacion";
+		boolean existeCache3 = jedisUtil.exists(key3);
+		if (existeCache3) {
+			String strobj = jedisUtil.get(key3);
+			 ec3 = new Gson().fromJson(strobj, CatalogoDTO.class);
+			System.out.println("CACHE object ....catalogoID-tipoIdentificacion :   " + ec3);
+		}else {
+			ec3= catalogoClientService.getCatalogo_TipoIdentificacion();
+			if (ec3!=null) {
+				String out = new Gson().toJson(ec3);
+				jedisUtil.set(key3, out);
+			}
+		}
+		for (ItemCat i : ec3.getItems()) {
 			if (i.getKey().equalsIgnoreCase(p.getTipoIdentificacion())) {
 				vti = true;
 			}
